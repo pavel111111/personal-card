@@ -13,11 +13,11 @@ app.use(express.json({ limit: "5mb" }));
 // PostgreSQL
 // ─────────────────────────────────────────────
 export const pool = new Pool({
-  host: "127.0.0.1",
-  user: "isd",
+  host: "ec2-13-49-243-0.eu-north-1.compute.amazonaws.com",
+  user: "kpv",
   password: "tomcat",
   database: "sdk_3101",
-  port: 5432,
+  port: 5454,
 });
 
 // ─────────────────────────────────────────────
