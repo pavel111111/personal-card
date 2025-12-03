@@ -1,8 +1,7 @@
 <template>
-  <PibForm />
+  <router-view></router-view>
 </template>
 
 <script>
-import PibForm from "./components/PibForm.vue";
-export default { components: { PibForm } };
+export default {};
 </script>
