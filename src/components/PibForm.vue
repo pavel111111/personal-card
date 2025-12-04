@@ -358,6 +358,8 @@ const loadSoldier = async () => {
     for (const key in soldier.value) {
       if (data.data.data.hasOwnProperty(key)) {
         soldier.value[key] = data.data.data[key];
+
+        
       }
     }
 
