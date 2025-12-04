@@ -1,15 +1,11 @@
-import pool from "./db.js";
+import express from "express";
+import { pool } from "../db.js";
 
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
-    return res
-      .status(405)
-      .json({ success: false, error: "Method not allowed" });
-  }
+const router = express.Router();
 
+router.get("/person", async (req, res) => {
   try {
-    const { dog_tag } = req.query || {};
+    const { dog_tag } = req.query;
 
     if (!dog_tag) {
       return res
@@ -19,9 +15,14 @@ export default async function handler(req, res) {
 
     const result = await pool.query(
       `
-      SELECT data
-      FROM soldiers
-      WHERE personal_number = $1
+SELECT  
+  p.data
+  || jsonb_build_object(
+       'photo', 'data:image/jpeg;base64,' || encode(pp.photo, 'base64')
+     ) AS data
+FROM personals p
+LEFT JOIN personal_photos pp ON pp.person_id = p.id
+WHERE dog_tag = $1;
       `,
       [dog_tag]
     );
@@ -46,4 +47,6 @@ export default async function handler(req, res) {
       .status(500)
       .json({ success: false, error: err.message || "Server error" });
   }
-}
+});
+
+export default router;

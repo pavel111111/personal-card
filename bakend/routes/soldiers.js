@@ -1,13 +1,9 @@
-import pool from "./db.js";
+import express from "express";
+import { pool } from "../db.js";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res
-      .status(405)
-      .json({ success: false, error: "Method not allowed" });
-  }
+const router = express.Router();
 
+router.post("/soldiers", async (req, res) => {
   try {
     const data = req.body;
 
@@ -17,6 +13,7 @@ export default async function handler(req, res) {
         .json({ success: false, error: "Missing personal_number" });
     }
 
+    // Якщо фото прийшло як dataURL – розбиваємо на mime + base64
     if (typeof data.photo === "string" && data.photo.startsWith("data:")) {
       const match = data.photo.match(/^data:(.*?);base64,(.*)$/);
       if (match) {
@@ -28,12 +25,9 @@ export default async function handler(req, res) {
 
     await pool.query(
       `
-      INSERT INTO soldiers (personal_number, data)
-      VALUES ($1, $2::jsonb)
-      ON CONFLICT (personal_number)
-      DO UPDATE SET data = EXCLUDED.data
+       SELECT save_personal_data($1::JSONB);
       `,
-      [data.personal_number, JSON.stringify(data)]
+      [JSON.stringify(data)]
     );
 
     return res.status(200).json({ success: true });
@@ -43,4 +37,6 @@ export default async function handler(req, res) {
       .status(500)
       .json({ success: false, error: err.message || "Server error" });
   }
-}
+});
+
+export default router;

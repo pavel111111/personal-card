@@ -187,6 +187,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+const API_URL = import.meta.env.VITE_API_URL || "";
 const triedSubmit = ref(false)
 
 const photoPreview = ref(null)
@@ -301,7 +302,7 @@ async function save() {
   if (!isFormValid.value) return
   try {
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soldiers`, {
+    const response = await fetch(`${API_URL}/api/soldiers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -340,7 +341,7 @@ const loadSoldier = async () => {
   }
 
   try {
-     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/person?dog_tag=${encodeURIComponent(dogTag)}`, {
+     const response = await fetch(`${API_URL}/api/person?dog_tag=${encodeURIComponent(dogTag)}`, {
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -361,14 +362,11 @@ const loadSoldier = async () => {
     }
 
     
-    // Якщо фото є, формуємо data URL для <img>
-    if (soldier.value.photo) {
-        const cleanedBase64 = soldier.value.photo.replace(/\s+/g, '');
-      photoPreview.value = `data:${soldier.value.photo_mime};base64,${cleanedBase64}`;
-      //photoPreview.value = `data:image/jpeg;base64,${soldier.value.photo}`;
-    } else {
-      photoPreview.value = null;
-    }
+if (soldier.value.photo) {
+  photoPreview.value = soldier.value.photo;
+} else {
+  photoPreview.value = null;
+}
     // Даємо Vue оновити DOM
     await nextTick();
 

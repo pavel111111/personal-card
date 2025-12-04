@@ -1,19 +1,21 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "my_secret_key"; // заміни на щось своє
+const SECRET_KEY = process.env.JWT_SECRET || "my_secret_key";
 
 export function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ success: false, error: "No token" });
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-  const token = authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ success: false, error: "Invalid token" });
+  if (!token) {
+    return res.status(401).json({ error: "Missing Authorization header" });
+  }
 
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ success: false, error: "Token invalid" });
+    console.error("JWT error:", err.message);
+    return res.status(401).json({ error: "Invalid or expired token" });
   }
 }
