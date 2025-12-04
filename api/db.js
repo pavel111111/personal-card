@@ -6,7 +6,7 @@ const pool = new Pool({
   user: process.env.DB_USER || "kpv",
   password: process.env.DB_PASS || "tomcat",
   database: process.env.DB_NAME || "sdk_3101",
-  port: Number(process.env.DB_PORT) || 5432,
+  port: Number(process.env.DB_PORT) || 5454,
 });
 
 export default pool;
