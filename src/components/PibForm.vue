@@ -364,8 +364,8 @@ const loadSoldier = async () => {
     // Якщо фото є, формуємо data URL для <img>
     if (soldier.value.photo) {
         const cleanedBase64 = soldier.value.photo.replace(/\s+/g, '');
-      //photoPreview.value = `data:${soldier.value.photo_mime};base64,${cleanedBase64}`;
-      photoPreview.value = `data:image/jpeg;base64,${soldier.value.photo}`;
+      photoPreview.value = `data:${soldier.value.photo_mime};base64,${cleanedBase64}`;
+      //photoPreview.value = `data:image/jpeg;base64,${soldier.value.photo}`;
     } else {
       photoPreview.value = null;
     }
