@@ -299,10 +299,9 @@ function onPhotoUpload(event) {
 async function save() {
   triedSubmit.value = true
   if (!isFormValid.value) return
-
   try {
 
-    const response = await fetch("http://localhost:3001/api/soldiers", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/soldiers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -337,12 +336,11 @@ const loadSoldier = async () => {
   const dogTag = soldier.value.personal_number;
 
   if (!dogTag) {
-    //alert("Поле 'Особовий номер (жетон)' пусте!");
     return;
   }
 
   try {
-     const response = await fetch(`http://localhost:3001/api/person?dog_tag=${encodeURIComponent(dogTag)}`, {
+     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/person?dog_tag=${encodeURIComponent(dogTag)}`, {
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -362,8 +360,12 @@ const loadSoldier = async () => {
       }
     }
 
-     if (data.data.data.photo) {
-        photoPreview.value = soldier.value.photo;
+    
+    // Якщо фото є, формуємо data URL для <img>
+    if (soldier.value.photo) {
+        const cleanedBase64 = soldier.value.photo.replace(/\s+/g, '');
+      //photoPreview.value = `data:${soldier.value.photo_mime};base64,${cleanedBase64}`;
+      photoPreview.value = `data:image/jpeg;base64,${soldier.value.photo}`;
     } else {
       photoPreview.value = null;
     }

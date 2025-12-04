@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "my_super_secret_key"; // заміни на щось своє
+const SECRET_KEY = "my_secret_key"; // заміни на щось своє
 
 export function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;

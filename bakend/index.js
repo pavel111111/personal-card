@@ -61,7 +61,11 @@ app.get("/api/person", authMiddleware, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT data FROM personals WHERE dog_tag = $1",
+      `SELECT 
+         p.data || jsonb_build_object('photo', encode(pp.photo, 'base64')) AS data
+       FROM personals p
+       LEFT JOIN personal_photos pp ON pp.person_id = p.id
+       WHERE dog_tag = $1;`,
       [dog_tag]
     );
 
