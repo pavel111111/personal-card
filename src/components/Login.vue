@@ -22,11 +22,7 @@ const router = useRouter();
 const doLogin = async () => {
   error.value = '';
   try {
-<<<<<<< HEAD
     const res = await fetch(`${API_URL}/api/login`, {
-=======
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
->>>>>>> 37aeb33f860ddb189c4a5508e34b851deaded885
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login: login.value, password: password.value })
@@ -39,7 +35,7 @@ const doLogin = async () => {
     }
 
     localStorage.setItem('token', data.token);
-    router.push('/form'); // Перенаправлення після логіну
+    router.push('/form');
   } catch (err) {
     console.error(err);
     error.value = 'Серверна помилка';
