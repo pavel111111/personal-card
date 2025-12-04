@@ -19,38 +19,21 @@ const router = useRouter();
 
 const doLogin = async () => {
   error.value = '';
-
-  if (!login.value || !password.value) {
-    error.value = 'Введіть логін і пароль';
-    return;
-  }
-
   try {
-    const res = await fetch('/api/login', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login: login.value, password: password.value })
     });
 
-    // Перевірка, чи прийшов валідний JSON
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (jsonErr) {
-      console.error('Invalid JSON response:', text);
-      error.value = 'Сервер повернув некоректні дані';
-      return;
-    }
-
+    const data = await res.json();
     if (!data.success) {
       error.value = data.error || 'Помилка авторизації';
       return;
     }
 
-    localStorage.setItem('token', data.token || '');
+    localStorage.setItem('token', data.token);
     router.push('/form'); // Перенаправлення після логіну
-
   } catch (err) {
     console.error(err);
     error.value = 'Серверна помилка';
@@ -60,7 +43,6 @@ const doLogin = async () => {
 
 <style>
 .login-container { width: 300px; margin: 50px auto; text-align: center; }
-.login-container input { display: block; margin: 10px auto; width: 90%; padding: 5px; }
-button { padding: 5px 10px; cursor: pointer; }
-.error { color: red; margin-top: 10px; }
+.login-container input { display:block; margin: 10px auto; width: 90%; padding:5px; }
+.error { color:red; margin-top:10px; }
 </style>
