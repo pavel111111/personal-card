@@ -19,9 +19,9 @@ export default async function handler(req, res) {
 
     const result = await pool.query(
       `
-      SELECT data
-      FROM soldiers
-      WHERE personal_number = $1
+    SELECT  p.data || jsonb_build_object('photo', 'data:image/jpeg;base64,' || encode(pp.photo, 'base64')
+     ) AS data FROM personals p LEFT JOIN personal_photos pp ON pp.person_id = p.id
+    WHERE dog_tag = $1;
       `,
       [dog_tag]
     );
