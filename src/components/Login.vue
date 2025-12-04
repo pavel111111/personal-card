@@ -14,7 +14,8 @@ import { useRouter } from 'vue-router';
 
 const login = ref('');
 const password = ref('');
-const API_URL = "";
+const API_URL = import.meta.env.VITE_API_URL ||
+  (window.location.hostname === "localhost" ? "http://localhost:3001" : "");
 
 const error = ref('');
 const router = useRouter();
@@ -22,7 +23,7 @@ const router = useRouter();
 const doLogin = async () => {
   error.value = '';
   try {
-    const res = await fetch(`api/login`, {
+    const res = await fetch(`${API_URL}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ login: login.value, password: password.value })
