@@ -265,15 +265,21 @@ async function uploadPhoto(id) {
   const form = new FormData();
   form.append("photo", soldier.value.photoFile);
 
-  const res = await fetch(`${API_URL}/api/soldiers/${id}/photo`, {
+  const res = await fetch(`${API_URL}/api/upload-photo?id=${id}`, {
     method: "POST",
-    headers: { "Authorization": "Bearer " + localStorage.getItem("token") },
     body: form
   });
 
   const data = await res.json();
-  if (data.success) photoPreview.value = data.photoUrl;
+
+  if (data.success) {
+    soldier.value.photoUrl = data.photoUrl;
+    photoPreview.value = data.photoUrl;
+  } else {
+    console.error("PHOTO UPLOAD ERROR:", data.error);
+  }
 }
+
 
 async function save() {
   triedSubmit.value = true;
