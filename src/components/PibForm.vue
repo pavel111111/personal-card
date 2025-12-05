@@ -237,7 +237,7 @@ const requiredFields = [
   "last_name","first_name","middle_name","birth_info","phone_nums",
   "home_address","registration_address","when_called","who_called",
   "service_type","position","family_status","tax_id","personal_number",
-  "military_ticket","passport","military_rank","photo"
+  "military_ticket","passport","military_rank","photoUrl"
 ]
 
 const isFormValid = computed(() => {
