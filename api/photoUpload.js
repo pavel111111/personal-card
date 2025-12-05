@@ -1,4 +1,4 @@
-import { pool } from "../../../../db.js";
+import pool from "./db.js";
 
 // Manual multipart/form-data parser (no Multer on Vercel)
 async function parseMultipart(req) {

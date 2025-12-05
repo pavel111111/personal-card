@@ -1,4 +1,4 @@
-import { pool } from "../../../db.js";   // ← перевір правильний шлях
+import pool from "./db.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
