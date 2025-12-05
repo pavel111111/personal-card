@@ -265,7 +265,7 @@ async function uploadPhoto(id) {
   const form = new FormData();
   form.append("photo", soldier.value.photoFile);
 
-  const res = await fetch(`${API_URL}/api/upload-photo?id=${id}`, {
+  const res = await fetch(`${API_URL}/api/photoUpload?id=${id}`, {
     method: "POST",
     body: form
   });

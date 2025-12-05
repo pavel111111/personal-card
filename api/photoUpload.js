@@ -42,7 +42,7 @@ export default async function handler(req, res) {
   const protocol = req.headers["x-forwarded-proto"] || "https";
   const baseUrl = `${protocol}://${host}`;
 
-  const photoUrl = `${baseUrl}/api/upload-photo?id=${soldierId}`;
+  const photoUrl = `${baseUrl}/api/photoUpload?id=${soldierId}`;
 
   await pool.query(
     `INSERT INTO personal_photos (person_id, photo, mime_type, photo_url)
