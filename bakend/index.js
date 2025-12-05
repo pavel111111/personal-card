@@ -3,6 +3,9 @@ import cors from "cors";
 import loginRoute from "./routes/login.js";
 import soldiersRoute from "./routes/soldiers.js";
 import personRoute from "./routes/person.js";
+import photoRoute from "./routes/photo.js";
+import photoUploadRoute from "./routes/photoUpload.js";
+
 import { authMiddleware } from "./middleware/auth.js";
 
 const app = express();
@@ -25,10 +28,14 @@ app.get("/", (req, res) => {
 
 // Public route: login
 app.use("/api", loginRoute);
+app.use("/api", photoRoute);
 
 // Protected routes: everything below requires valid JWT
 app.use("/api", authMiddleware, soldiersRoute);
 app.use("/api", authMiddleware, personRoute);
+app.use("/api", photoUploadRoute);
+
+
 
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);

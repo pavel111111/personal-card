@@ -13,29 +13,33 @@ router.post("/soldiers", async (req, res) => {
         .json({ success: false, error: "Missing personal_number" });
     }
 
-    // Якщо фото прийшло як dataURL – розбиваємо на mime + base64
-    if (typeof data.photo === "string" && data.photo.startsWith("data:")) {
-      const match = data.photo.match(/^data:(.*?);base64,(.*)$/);
-      if (match) {
-        const [, mime, base64] = match;
-        data.photo_mime = mime;
-        data.photo = base64;
-      }
-    }
-
-    await pool.query(
+    const result = await pool.query(
       `
-       SELECT save_personal_data($1::JSONB);
+       SELECT save_personal_data($1::JSONB) AS out;
       `,
       [JSON.stringify(data)]
     );
 
-    return res.status(200).json({ success: true });
+    const out = result.rows[0]?.out;
+
+    if (!out) {
+      return res.status(500).json({
+        success: false,
+        error: "save_personal_data returned nothing"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: out
+    });
+
   } catch (err) {
     console.error("ERROR in /api/soldiers:", err);
-    return res
-      .status(500)
-      .json({ success: false, error: err.message || "Server error" });
+    return res.status(500).json({
+      success: false,
+      error: err.message || "Server error"
+    });
   }
 });
 

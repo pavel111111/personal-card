@@ -13,19 +13,10 @@ router.get("/person", async (req, res) => {
         .json({ success: false, error: "Missing dog_tag" });
     }
 
-    const result = await pool.query(
-      `
-SELECT  
-  p.data
-  || jsonb_build_object(
-       'photo', 'data:image/jpeg;base64,' || encode(pp.photo, 'base64')
-     ) AS data
-FROM personals p
-LEFT JOIN personal_photos pp ON pp.person_id = p.id
-WHERE dog_tag = $1;
-      `,
-      [dog_tag]
-    );
+    const result = await pool.query(`SELECT p.data || 
+      jsonb_build_object('photoUrl', pp.photo_url) as data FROM personals p LEFT JOIN 
+      personal_photos pp ON p.id = pp.person_id 
+      WHERE p.dog_tag = $1;`, [dog_tag]);
 
     if (result.rows.length === 0) {
       return res
