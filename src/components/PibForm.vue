@@ -15,7 +15,7 @@
         <div v-else class="photo-placeholder">Фото</div>
 
         <label class="upload-btn">
-          Оновити
+          Додати/Оновити
           <input type="file" @change="onPhotoUpload" />
         </label>
       </div>
@@ -57,6 +57,7 @@
       <div class="field" style="text-align:left">
         Я,____________________________________, надаю згоду для опрацювання своїх персональних даних офіцерам НГУ на період проходження служби. _____________ (підпис)
       </div>
+      <div class="field" :class="{ invalid: !soldier.military_ticket && triedSubmit }"><label>Військове звання:</label> <input v-model="soldier.military_rank" /></div>
 
       <div class="field" :class="{ invalid: !soldier.position && triedSubmit }">
         <label>Займана посада:</label>
@@ -221,6 +222,7 @@ const soldier = ref({
   before_service_records: "",
   photoFile: null,
   photoUrl: "",
+  military_rank:"",
   family: [
     { relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" }
   ]
@@ -230,7 +232,7 @@ const requiredFields = [
   "last_name","first_name","middle_name","birth_info","phone_nums",
   "home_address","registration_address","when_called","who_called",
   "service_type","position","family_status","tax_id","personal_number",
-  "military_ticket","passport"
+  "military_ticket","passport","military_rank"
 ]
 
 const isFormValid = computed(() => {
