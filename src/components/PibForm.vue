@@ -13,7 +13,7 @@
     <!-- Верхній блок -->
     <div class="top-section">
 
-      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photo && triedSubmit }">
+      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photoUrl && triedSubmit }">
         <img v-if="photoPreview" :src="photoPreview" class="photo"/>
         <div v-else class="photo-placeholder">Фото</div>
 
