@@ -49,7 +49,11 @@ export default async function handler(req, res) {
       { expiresIn: "1h" }
     );
 
-    return res.json({ success: true, token });
+    return res.json({ success: true,  token, user: {
+              id: user.id,
+              login: user.user_name,
+              fullName: user.full_name
+    }});
   } catch (err) {
     console.error("Login error:", err);
     return res

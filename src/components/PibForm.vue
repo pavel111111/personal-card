@@ -2,6 +2,9 @@
 <div class="card" :class="{ disabled: isLoading }" ref="pdfArea">
 
     <h1 class="title">
+        <div class="active-user" v-if="user">
+    {{ user.fullName }} - {{loginDate}}
+  </div>
       <button class="add-row" @click="loadSoldier">
         СОЦІАЛЬНО - ДЕМОГРАФІЧНА КАРТКА НА ВІЙСЬКОВОСЛУЖБОВЦЯ
       </button>
@@ -10,17 +13,15 @@
     <!-- Верхній блок -->
     <div class="top-section">
 
-<div class="field" :class="{ invalid: !photoPreview && triedSubmit }">
-  <div ref="photoBox" class="photo-box">
-    <img v-if="photoPreview" :src="photoPreview" class="photo"/>
-    <div v-else class="photo-placeholder">Фото</div>
+      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photo && triedSubmit }">
+        <img v-if="photoPreview" :src="photoPreview" class="photo"/>
+        <div v-else class="photo-placeholder">Фото</div>
 
-    <label class="upload-btn">
-      Додати/Оновити
-      <input type="file" @change="onPhotoUpload" />
-    </label>
-  </div>
-</div>
+        <label class="upload-btn">
+          Додати/Оновити
+          <input type="file" @change="onPhotoUpload" />
+        </label>
+      </div>
 
       <div class="main-info">
 
@@ -179,6 +180,8 @@ const pdfArea = ref(null)
 const photoBox = ref(null);
 let boxWidth = 0;
 let boxHeight = 0;
+const loginDate = new Date().toLocaleDateString("uk-UA");
+
 
 onMounted(() => {
   const rect = photoBox.value.getBoundingClientRect();
@@ -407,10 +410,10 @@ function resizeImage(file, maxWidth, maxHeight) {
   });
 }
 
+//--------------------------------------------------------------
 async function savePdf() {
   const original = pdfArea.value;
   if (!original) return;
-
 
   const buttons = original.querySelectorAll("button:not(.add-row), .save-btn, .upload-btn");
   buttons.forEach(b => b.classList.add("pdf-hide"));
@@ -542,7 +545,12 @@ pdf.save(`${soldier.value.last_name || "card"}.pdf`);
     clone.remove();
   }
 }
-
+//--------------------------------------------------------------
+const user = ref(null);
+onMounted(() => {
+  const u = localStorage.getItem("user");
+  if (u) user.value = JSON.parse(u).user;
+});
 
 </script>
 
@@ -693,5 +701,14 @@ pdf.save(`${soldier.value.last_name || "card"}.pdf`);
 .add-row, .save-btn {
   margin-top: 15px;
   padding: 8px 15px;
+}
+.photo-box.invalid {
+  border: 2px solid red !important;
+}
+.active-user{
+  font-size: 10px;
+  text-align: right;
+  margin-bottom: 2px; 
+  padding: 0
 }
 </style>

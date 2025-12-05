@@ -36,6 +36,9 @@ const doLogin = async () => {
     }
 
     localStorage.setItem('token', data.token);
+    console.log(JSON.stringify(data))
+    localStorage.setItem("user", JSON.stringify(data));
+
     router.push('/form');
   } catch (err) {
     console.error(err);
