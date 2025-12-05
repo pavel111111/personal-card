@@ -1,12 +1,11 @@
-import pool from "./db.js";
+import { pool } from "./db.js";
 
 export const config = {
-  api: { bodyParser: false }, // потрібно для файлів
+  api: { bodyParser: false }, 
 };
 
-// зчитуємо raw multipart payload
 async function readBody(req) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let data = [];
     req.on("data", chunk => data.push(chunk));
     req.on("end", () => resolve(Buffer.concat(data)));
@@ -18,8 +17,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: "Method Not Allowed" });
   }
 
-  // ID передається НЕ в URL, а в FormData
-  const soldierId = req.query.id || req.headers["x-soldier-id"];
+  const soldierId = req.query.id;
   if (!soldierId) {
     return res.status(400).json({ success: false, error: "Missing id" });
   }
@@ -30,9 +28,7 @@ export default async function handler(req, res) {
 
   const parts = raw.toString().split(`--${boundary}`);
   const filePart = parts.find(p => p.includes("filename"));
-  if (!filePart) {
-    return res.status(400).json({ success: false, error: "No file uploaded" });
-  }
+  if (!filePart) return res.status(400).json({ success: false, error: "No file uploaded" });
 
   const mimeMatch = filePart.match(/Content-Type: (.*)/);
   const mimeType = mimeMatch ? mimeMatch[1].trim() : "image/jpeg";
@@ -41,7 +37,7 @@ export default async function handler(req, res) {
   const end = filePart.lastIndexOf("\r\n");
   const fileBuffer = Buffer.from(filePart.substring(start, end), "binary");
 
-  // Домен Vercel
+  // Build correct absolute URL (works on Vercel and local)
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const protocol = req.headers["x-forwarded-proto"] || "https";
   const baseUrl = `${protocol}://${host}`;
@@ -56,5 +52,5 @@ export default async function handler(req, res) {
     [soldierId, fileBuffer, mimeType, photoUrl]
   );
 
-  return res.json({ success: true, photoUrl });
+  return res.status(200).json({ success: true, photoUrl });
 }
