@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 import pool from "./db.js";
 
 const SECRET_KEY = process.env.JWT_SECRET || "my_secret_key";

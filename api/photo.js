@@ -1,5 +1,4 @@
-import pool from "./db.js";
-
+import { pool } from "./db.js"
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     return res.status(405).json({ success: false, error: "Method Not Allowed" });
