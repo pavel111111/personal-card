@@ -10,15 +10,17 @@
     <!-- Верхній блок -->
     <div class="top-section">
 
-      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photo && triedSubmit }">
-        <img v-if="photoPreview" :src="photoPreview" class="photo"/>
-        <div v-else class="photo-placeholder">Фото</div>
+<div class="field" :class="{ invalid: !photoPreview && triedSubmit }">
+  <div ref="photoBox" class="photo-box">
+    <img v-if="photoPreview" :src="photoPreview" class="photo"/>
+    <div v-else class="photo-placeholder">Фото</div>
 
-        <label class="upload-btn">
-          Додати/Оновити
-          <input type="file" @change="onPhotoUpload" />
-        </label>
-      </div>
+    <label class="upload-btn">
+      Додати/Оновити
+      <input type="file" @change="onPhotoUpload" />
+    </label>
+  </div>
+</div>
 
       <div class="main-info">
 
