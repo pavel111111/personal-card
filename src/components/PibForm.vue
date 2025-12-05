@@ -236,8 +236,14 @@ const requiredFields = [
 ]
 
 const isFormValid = computed(() => {
-  return requiredFields.every(f => soldier.value[f] && soldier.value[f].toString().trim() !== "")
-})
+  let fields = [...requiredFields];
+
+  if (soldier.value.ubd_status) {
+    fields.push("ubd_data", "ubd_date");
+  }
+
+  return fields.every(f => soldier.value[f] && soldier.value[f].toString().trim() !== "");
+});
 
 function onPersonalNumberInput(e) {
   let value = e.target.value.replace(/[^а-яА-ЯїЇіІєЄґҐ0-9-]/g, '');
