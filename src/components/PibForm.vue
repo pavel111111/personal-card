@@ -225,9 +225,9 @@ const soldier = ref({
   admin_records: "",
   is_before_service_records: false,
   before_service_records: "",
-  photoFile: null,
   photoUrl: "",
   military_rank:"",
+  user:"",
   family: [
     { relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" }
   ]
@@ -263,6 +263,7 @@ function addFamilyRow() {
   soldier.value.family.push({ relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" })
 }
 
+//--------------------------------------------------------------
 async function onPhotoUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -272,6 +273,7 @@ async function onPhotoUpload(e) {
   photoPreview.value = resized.dataUrl;
 }
 
+//--------------------------------------------------------------
 async function uploadPhoto(id) {
   if (!soldier.value.photoFile) return;
 
@@ -293,7 +295,7 @@ async function uploadPhoto(id) {
   }
 }
 
-
+//--------------------------------------------------------------
 async function save() {
   triedSubmit.value = true;
   if (!isFormValid.value) return;
@@ -335,6 +337,7 @@ function autoResize(e) {
   el.style.height = el.scrollHeight + "px";
 }
 
+//--------------------------------------------------------------
 const loadSoldier = async () => {
   const dogTag = soldier.value.personal_number;
   if (!dogTag) return;
@@ -372,6 +375,7 @@ const loadSoldier = async () => {
   }
 };
 
+//--------------------------------------------------------------
 function resizeImage(file, maxWidth, maxHeight) {
   return new Promise(resolve => {
     const reader = new FileReader();
@@ -549,7 +553,10 @@ pdf.save(`${soldier.value.last_name || "card"}.pdf`);
 const user = ref(null);
 onMounted(() => {
   const u = localStorage.getItem("user");
-  if (u) user.value = JSON.parse(u).user;
+  if (u){
+     user.value = JSON.parse(u).user;
+     soldier.value.user = user.fullName;
+  }
 });
 
 </script>
