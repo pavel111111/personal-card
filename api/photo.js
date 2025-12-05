@@ -1,4 +1,5 @@
-import pool from "./db.js"
+import pool from "./db.js"; 
+
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     return res.status(405).json({ success: false, error: "Method Not Allowed" });
@@ -20,11 +21,12 @@ export default async function handler(req, res) {
 
     const { photo, mime_type } = result.rows[0];
 
-    // ВАЖЛИВО: повідомляємо Vercel, що це двійкові дані
+    // Правильні заголовки для двійкових даних
     res.setHeader("Content-Type", mime_type || "image/jpeg");
     res.setHeader("Content-Length", photo.length);
 
-    return res.status(200).end(photo);  // Віддаємо Buffer як є
+    // ВІДДАЄМО БУФЕР — не JSON!
+    return res.status(200).send(photo);
 
   } catch (e) {
     console.error("PHOTO ERROR:", e);

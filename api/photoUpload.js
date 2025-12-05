@@ -69,12 +69,11 @@ export default async function handler(req, res) {
     const fileBuffer = Buffer.from(filePart.substring(start, end), "binary");
 
     // Detect Vercel URL (dynamic)
-    const baseUrl =
-      process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3001";
+const host = req.headers["x-forwarded-host"] || req.headers.host;
+const protocol = req.headers["x-forwarded-proto"] || "https";
+const baseUrl = `${protocol}://${host}`;
 
-    const photoUrl = `${baseUrl}/api/photo?id=${soldierId}`;
+const photoUrl = `${baseUrl}/api/photo?id=${soldierId}`;
 
     // Save into DB
     await pool.query(
