@@ -18,8 +18,14 @@ router.get("/photo", async (req, res) => {
 
     const { photo, mime_type } = result.rows[0];
 
+    // 🔥 ДОДАТИ ЦЕ (інакше PDF ніколи не побачить фото)
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
+
     res.setHeader("Content-Type", mime_type || "image/jpeg");
     res.send(photo);
+
   } catch (e) {
     console.error("PHOTO ERROR:", e);
     res.status(500).end();

@@ -424,7 +424,8 @@ function resizeImage(file, maxWidth, maxHeight) {
 async function savePdf() {
   const original = pdfArea.value;
   if (!original) return;
-
+  isLoading.value = true;
+  
   const buttons = original.querySelectorAll("button:not(.add-row), .save-btn, .upload-btn");
   buttons.forEach(b => b.classList.add("pdf-hide"));
 
@@ -547,12 +548,25 @@ const renderedHeight = canvas.height * (usableWidth / canvas.width);
 
 pdf.addImage(img, "PNG", marginX, marginY, usableWidth, renderedHeight);
 
-pdf.save(`${soldier.value.last_name || "card"}.pdf`);
+
+const lastName = soldier.value.last_name || "card";
+const firstName = soldier.value.first_name || "";
+const fatherName = soldier.value.middle_name || "";
+const dogT = soldier.value.personal_number;
+
+const initialFirst = firstName ? firstName[0].toUpperCase() + "." : "";
+const initialFather = fatherName ? fatherName[0].toUpperCase() + "." : "";
+
+const fileName = `${lastName} ${initialFirst}${initialFather}(${dogT}).pdf`;
+
+pdf.save(fileName);
+
   }
   finally { 
     buttons.forEach(b => b.classList.remove("pdf-hide"));
 
     clone.remove();
+    isLoading.value = false;
   }
 }
 //--------------------------------------------------------------

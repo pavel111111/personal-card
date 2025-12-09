@@ -8,7 +8,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post(
-  "/soldiers/:id/photo",
+  "/soldiers/photoUpload",
   upload.single("photo"),
   async (req, res) => {
     try {
