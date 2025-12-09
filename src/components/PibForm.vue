@@ -248,11 +248,6 @@ const isFormValid = computed(() => {
     fields.push("ubd_data", "ubd_date");
   }
 
-if (!soldier.family?.[0]?.fullname || soldier.family[0].fullname.length < 5) {
-  alert("Додайте родичів");
-  return;
-}
-
   return fields.every(f => soldier.value[f] && soldier.value[f].toString().trim() !== "");
 });
 
@@ -306,6 +301,10 @@ async function save() {
   triedSubmit.value = true;
   if (!isFormValid.value) return;
 
+  if (!soldier.value.family?.[0]?.fullname || soldier.value.family[0].fullname.length < 5) {
+    alert("Додайте родичів");
+    return;
+  }
   isLoading.value = true;
   try {
     const res = await fetch(`${API_URL}/api/soldiers`, {
