@@ -230,7 +230,7 @@ const soldier = ref({
   user:"",
   photoFile:"",
   family: [
-    { relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" }
+    { relation: "", fullname: "", birth_date: null, workplace: "", address: "", phone: "" }
   ]
 })
 
@@ -247,6 +247,11 @@ const isFormValid = computed(() => {
   if (soldier.value.ubd_status) {
     fields.push("ubd_data", "ubd_date");
   }
+
+if (!soldier.family?.[0]?.fullname || soldier.family[0].fullname.length < 5) {
+  alert("Додайте родичів");
+  return;
+}
 
   return fields.every(f => soldier.value[f] && soldier.value[f].toString().trim() !== "");
 });
@@ -319,7 +324,7 @@ async function save() {
     }
 
     const id = json.data.personal_id;
-    alert(JSON.stringify(json.data))
+
     await uploadPhoto(id);
 
     alert("Дані збережено!");
