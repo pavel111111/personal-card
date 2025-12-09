@@ -13,7 +13,7 @@
     <!-- Верхній блок -->
     <div class="top-section">
 
-      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photoUrl && triedSubmit }">
+      <div ref="photoBox" class="photo-box" :class="{ invalid: !soldier.photoFile && triedSubmit }">
         <img v-if="photoPreview" :src="photoPreview" class="photo"/>
         <div v-else class="photo-placeholder">Фото</div>
 
@@ -238,7 +238,7 @@ const requiredFields = [
   "last_name","first_name","middle_name","birth_info","phone_nums",
   "home_address","registration_address","when_called","who_called",
   "service_type","position","family_status","tax_id","personal_number",
-  "military_ticket","passport","military_rank","photoFile"
+  "military_ticket","passport","military_rank"
 ]
 
 const isFormValid = computed(() => {
@@ -319,6 +319,7 @@ async function save() {
     }
 
     const id = json.data.personal_id;
+    alert(JSON.stringify(json.data))
     await uploadPhoto(id);
 
     alert("Дані збережено!");
