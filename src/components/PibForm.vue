@@ -74,11 +74,11 @@
         <label>Сімейний стан:</label>
         <select v-model="soldier.family_status">
           <option disabled value="">Оберіть cімейний стан</option>
-          <option value="type1">Одружений/Заміжня</option>
-          <option value="type2">Неодружений/Незаміжня</option>
-          <option value="type3">Розлучений(на)</option>
-          <option value="type4">Вдівець/Вдова</option>
-          <option value="type4">Цивільний шлюб</option>
+          <option value="merried">Одружений/Заміжня</option>
+          <option value="n_merried">Неодружений/Незаміжня</option>
+          <option value="divorsed">Розлучений(на)</option>
+          <option value="widow">Вдівець/Вдова</option>
+          <option value="civil">Цивільний шлюб</option>
         </select>
       </div>
 
@@ -228,6 +228,7 @@ const soldier = ref({
   photoUrl: "",
   military_rank:"",
   user:"",
+  photoFile:"",
   family: [
     { relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" }
   ]
@@ -237,7 +238,7 @@ const requiredFields = [
   "last_name","first_name","middle_name","birth_info","phone_nums",
   "home_address","registration_address","when_called","who_called",
   "service_type","position","family_status","tax_id","personal_number",
-  "military_ticket","passport","military_rank","photoUrl"
+  "military_ticket","passport","military_rank","photoFile"
 ]
 
 const isFormValid = computed(() => {
@@ -555,7 +556,7 @@ onMounted(() => {
   const u = localStorage.getItem("user");
   if (u){
      user.value = JSON.parse(u).user;
-     soldier.value.user = user.fullName;
+     soldier.value.user = user.value.fullName;
   }
 });
 
