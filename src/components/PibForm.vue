@@ -35,9 +35,17 @@
         <button type="button" class="btn-add" @click="addPhone">+</button>
         <button type="button" class="btn-remove" @click="removePhone">−</button>
         </label>
-        <textarea :value="maskedPhones" @keydown="onKeydown" @paste="onPaste" @input="autoResize($event)" rows="1" style="overflow:hidden; resize:none;">
+        <input
+  type="text"
+  inputmode="numeric"
+  :value="maskedPhones"
+ @keydown="onKeydown"
+  @input="onInput"
+/>
+        <!--<textarea :value="maskedPhones" @input="onInput" @paste="onPaste" rows="1" style="overflow:hidden; resize:none;">
 
         </textarea>
+      -->
         </div>
 
         <div class="field" :class="{ invalid: !soldier.home_address && triedSubmit }"><label>Адреса проживання:</label>
@@ -644,8 +652,52 @@ const removePhone = () => {
   }
 };
 
+const onInput = (e) => {
+  const raw = e.target.value;
+
+  // 1. Беремо ТІЛЬКИ цифри
+  const allDigits = raw.replace(/\D/g, "");
+
+  // 2. Максимум цифр = кількість масок * кількість X у масці
+  const capacity = phoneDigits.value.length * maskLength;
+  const limited = allDigits.slice(0, capacity);
+
+  // 3. Розбиваємо цифри по масках
+  let offset = 0;
+  phoneDigits.value = phoneDigits.value.map(() => {
+    const chunk = limited.slice(offset, offset + maskLength);
+    offset += maskLength;
+    return chunk;
+  });
+
+  // 4. Будуємо маску З НУЛЯ
+  updateMaskedPhones();
+
+  // 5. Встановлюємо текст поля вручну (перекриває автозаміни)
+  e.target.value = maskedPhones.value;
+};
+
 // ─────────────────────────────────────────────
-// Ввід клавіатури
+// Вставка з буфера (фільтр тільки цифр)
+const onPaste = (e) => {
+  e.preventDefault();
+
+  const text = (e.clipboardData || window.clipboardData).getData("text");
+  const digits = text.replace(/\D/g, "");
+
+  const i = phoneDigits.value.length - 1;
+  const free = maskLength - phoneDigits.value[i].length;
+
+  if (free > 0) {
+    phoneDigits.value[i] += digits.slice(0, free);
+    updateMaskedPhones();
+  }
+};
+
+const hasUnfilledPhones = computed(() => {
+  return maskedPhones.value.includes("X");
+});
+
 const onKeydown = (e) => {
   const key = e.key;
 
@@ -687,25 +739,6 @@ const onKeydown = (e) => {
   e.preventDefault();
 };
 
-// ─────────────────────────────────────────────
-// Вставка з буфера (фільтр тільки цифр)
-const onPaste = (e) => {
-  e.preventDefault();
-
-  const text = (e.clipboardData || window.clipboardData).getData("text");
-  const digits = text.replace(/\D/g, "");
-
-  const i = phoneDigits.value.length - 1;
-  const free = maskLength - phoneDigits.value[i].length;
-
-  if (free > 0) {
-    phoneDigits.value[i] += digits.slice(0, free);
-    updateMaskedPhones();
-  }
-};
-const hasUnfilledPhones = computed(() => {
-  return maskedPhones.value.includes("X");
-});
 </script>
 
 <style>
