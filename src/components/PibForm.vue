@@ -29,7 +29,16 @@
         <div class="field" :class="{ invalid: !soldier.first_name && triedSubmit }"><label>Ім’я:</label> <input v-model="soldier.first_name" /></div>
         <div class="field" :class="{ invalid: !soldier.middle_name && triedSubmit }"><label>По батькові:</label> <input v-model="soldier.middle_name" /></div>
         <div class="field" :class="{ invalid: !soldier.birth_info && triedSubmit }"><label>Дата народження:</label> <input type="date" v-model="soldier.birth_info" /></div>
-        <div class="field" :class="{ invalid: !soldier.phone_nums && triedSubmit }"><label>Номер телефону:</label> <input v-model="soldier.phone_nums" /></div>
+
+        <div class="field" :class="{ invalid: (hasUnfilledPhones || !soldier.phone_nums) && triedSubmit }">
+        <label> Номер телефону:
+        <button type="button" class="btn-add" @click="addPhone">+</button>
+        <button type="button" class="btn-remove" @click="removePhone">−</button>
+        </label>
+        <textarea :value="maskedPhones" @keydown="onKeydown" @paste="onPaste" @input="autoResize($event)" rows="1" style="overflow:hidden; resize:none;">
+
+        </textarea>
+        </div>
 
         <div class="field" :class="{ invalid: !soldier.home_address && triedSubmit }"><label>Адреса проживання:</label>
           <textarea v-model="soldier.home_address" @input="autoResize($event)" rows="1" style="overflow:hidden; resize:none;"></textarea>
@@ -60,7 +69,7 @@
       <div class="field" style="text-align:left">
         Я,____________________________________, надаю згоду для опрацювання своїх персональних даних офіцерам НГУ на період проходження служби. _____________ (підпис)
       </div>
-      <div class="field" :class="{ invalid: !soldier.military_ticket && triedSubmit }"><label>Військове звання:</label> <input v-model="soldier.military_rank" /></div>
+      <div class="field" :class="{ invalid: !soldier.military_rank && triedSubmit }"><label>Військове звання:</label> <input v-model="soldier.military_rank" /></div>
 
       <div class="field" :class="{ invalid: !soldier.position && triedSubmit }">
         <label>Займана посада:</label>
@@ -145,6 +154,7 @@
               <td><textarea v-model="member.address" @input="autoResize($event)" rows="1" style="overflow:hidden; resize:none; width:240px" :class="{ invalid: triedSubmit && !member.address }"></textarea></td>
 
               <td><textarea v-model="member.phone" @input="autoResize($event)" rows="1" style="overflow:hidden; resize:none; width:110px" :class="{ invalid: triedSubmit && !member.phone }"></textarea></td>
+
 
             </tr>
           </tbody>
@@ -300,6 +310,7 @@ async function uploadPhoto(id) {
 async function save() {
   triedSubmit.value = true;
   if (!isFormValid.value) return;
+  if(hasUnfilledPhones.value) return;
 
   if (!soldier.value.family?.[0]?.fullname || soldier.value.family[0].fullname.length < 5) {
     alert("Додайте родичів");
@@ -569,7 +580,9 @@ pdf.save(fileName);
     isLoading.value = false;
   }
 }
-//--------------------------------------------------------------
+
+//--------------------------------------------------
+
 const user = ref(null);
 onMounted(() => {
   const u = localStorage.getItem("user");
@@ -579,6 +592,120 @@ onMounted(() => {
   }
 });
 
+//------------------phone mask--------------------------------
+
+const mask = "38(0XX)XXX XX XX";
+const maskLength = (mask.match(/X/g) || []).length;
+
+
+const phoneDigits = ref([ "" ]);   // перший номер завжди є
+
+const maskedPhones = ref(mask);
+
+// Маска одного номера
+const applyMask = (digits) => {
+  let res = "";
+  let di = 0;
+
+  for (let ch of mask) {
+    if (ch === "X") {
+      res += di < digits.length ? digits[di++] : "X";
+    } else {
+      res += ch;
+    }
+  }
+  return res;
+};
+
+// ─────────────────────────────────────────────
+// Маска для всіх номерів у textarea
+const updateMaskedPhones = () => {
+  maskedPhones.value = phoneDigits.value
+    .map(d => applyMask(d))
+    .join(",");
+    soldier.value.phone_nums = maskedPhones.value;
+};
+
+// ─────────────────────────────────────────────
+// Додати номер (через кому)
+const addPhone = () => {
+  if(phoneDigits.value.length < 3){
+  phoneDigits.value.push("");
+  updateMaskedPhones();
+  }
+};
+
+// ─────────────────────────────────────────────
+// Видалити останній (але не перший)
+const removePhone = () => {
+  if (phoneDigits.value.length > 1) {
+    phoneDigits.value.pop();
+    updateMaskedPhones();
+  }
+};
+
+// ─────────────────────────────────────────────
+// Ввід клавіатури
+const onKeydown = (e) => {
+  const key = e.key;
+
+  // Поточний номер — останній у списку
+  const i = phoneDigits.value.length - 1;
+  const current = phoneDigits.value[i];
+
+  // ЦИФРА
+  if (key >= "0" && key <= "9") {
+    e.preventDefault();
+    if (current.length < maskLength) {
+      phoneDigits.value[i] += key;
+      updateMaskedPhones();
+    }
+    return;
+  }
+
+  // BACKSPACE
+  if (key === "Backspace") {
+    e.preventDefault();
+    if (current.length > 0) {
+      phoneDigits.value[i] = current.slice(0, -1);
+      updateMaskedPhones();
+    }
+    return;
+  }
+
+  // Блокуємо DELETE
+  if (key === "Delete") {
+    e.preventDefault();
+    return;
+  }
+
+  // Дозволені технічні
+  const allowed = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Tab", "Home", "End"];
+  if (allowed.includes(key)) return;
+
+  // Все інше блок
+  e.preventDefault();
+};
+
+// ─────────────────────────────────────────────
+// Вставка з буфера (фільтр тільки цифр)
+const onPaste = (e) => {
+  e.preventDefault();
+
+  const text = (e.clipboardData || window.clipboardData).getData("text");
+  const digits = text.replace(/\D/g, "");
+
+  const i = phoneDigits.value.length - 1;
+  const free = maskLength - phoneDigits.value[i].length;
+
+  if (free > 0) {
+    phoneDigits.value[i] += digits.slice(0, free);
+    updateMaskedPhones();
+  }
+};
+const hasUnfilledPhones = computed(() => {
+  return maskedPhones.value.includes("X");
+});
 </script>
 
 <style>
@@ -737,5 +864,35 @@ onMounted(() => {
   text-align: right;
   margin-bottom: 2px; 
   padding: 0
+}
+.btn-add,
+.btn-remove {
+  border: none;
+  padding: 2px 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 26px;
+  border-radius: 4px;
+  color: white;
+  transition: 0.2s ease;
+}
+
+/* зелена кнопка "+" */
+.btn-add {
+  background-color: #2ecc71;
+}
+
+.btn-add:hover {
+  background-color: #27ae60;
+}
+
+/* червона кнопка "-" */
+.btn-remove {
+  background-color: #e74c3c;
+}
+
+.btn-remove:hover {
+  background-color: #c0392b;
 }
 </style>
