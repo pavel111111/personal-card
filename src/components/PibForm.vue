@@ -382,6 +382,18 @@ const loadSoldier = async () => {
       if (data.hasOwnProperty(key)) soldier.value[key] = data[key];
     }
 
+  if (data.phone_nums) 
+  {
+  const phones = data.phone_nums.split(",").map(p => p.trim());
+
+  phoneDigits.value = phones.map(num => {
+    const digits = num.replace(/\D/g, "");
+    return digits.slice(0, maskLength);
+  });
+
+  updateMaskedPhones();
+  }
+
     if (data.photoUrl) {
       soldier.value.photoUrl = data.photoUrl;
       photoPreview.value = data.photoUrl;
@@ -590,7 +602,6 @@ pdf.save(fileName);
 }
 
 //--------------------------------------------------
-
 const user = ref(null);
 onMounted(() => {
   const u = localStorage.getItem("user");
@@ -601,16 +612,13 @@ onMounted(() => {
 });
 
 //------------------phone mask--------------------------------
-
 const mask = "38(0XX)XXX XX XX";
 const maskLength = (mask.match(/X/g) || []).length;
 
-
-const phoneDigits = ref([ "" ]);   // перший номер завжди є
+const phoneDigits = ref([ "" ]);
 
 const maskedPhones = ref(mask);
-
-// Маска одного номера
+//________________________________________
 const applyMask = (digits) => {
   let res = "";
   let di = 0;
@@ -625,45 +633,39 @@ const applyMask = (digits) => {
   return res;
 };
 
-// ─────────────────────────────────────────────
-// Маска для всіх номерів у textarea
+//________________________________________
 const updateMaskedPhones = () => {
   maskedPhones.value = phoneDigits.value
     .map(d => applyMask(d))
     .join(",");
     soldier.value.phone_nums = maskedPhones.value;
 };
-
-// ─────────────────────────────────────────────
-// Додати номер (через кому)
+//________________________________________
 const addPhone = () => {
   if(phoneDigits.value.length < 3){
   phoneDigits.value.push("");
   updateMaskedPhones();
   }
 };
-
-// ─────────────────────────────────────────────
-// Видалити останній (але не перший)
+//________________________________________
 const removePhone = () => {
   if (phoneDigits.value.length > 1) {
     phoneDigits.value.pop();
     updateMaskedPhones();
   }
 };
-
-let lastValue = ""; // зберігаємо попередній стан textarea
+//________________________________________
+let lastValue = ""; 
 
 const onInput = (e) => {
-  const char = e.data; // останній введений символ (може бути null при Backspace)
+  const char = e.data; 
 
-  // 1️⃣ Якщо введено НЕ цифру → просто відкатити зміни
   if (char && !/^\d$/.test(char)) {
-    e.target.value = maskedPhones.value; // повертаємо маску
+    e.target.value = maskedPhones.value; 
     return;
   }
 
-  // 2️⃣ Якщо Backspace
+//________________________________________
   const raw = e.target.value;
   const digits = raw.replace(/\D/g, "");
   
@@ -671,6 +673,7 @@ const onInput = (e) => {
   const limited = digits.slice(0, capacity);
 
   let offset = 0;
+
   phoneDigits.value = phoneDigits.value.map(() => {
     const chunk = limited.slice(offset, offset + maskLength);
     offset += maskLength;
@@ -683,23 +686,7 @@ const onInput = (e) => {
   lastValue = e.target.value;
 };
 
-// ─────────────────────────────────────────────
-// Вставка з буфера (фільтр тільки цифр)
-const onPaste = (e) => {
-  e.preventDefault();
-
-  const text = (e.clipboardData || window.clipboardData).getData("text");
-  const digits = text.replace(/\D/g, "");
-
-  const i = phoneDigits.value.length - 1;
-  const free = maskLength - phoneDigits.value[i].length;
-
-  if (free > 0) {
-    phoneDigits.value[i] += digits.slice(0, free);
-    updateMaskedPhones();
-  }
-};
-
+//________________________________________
 const hasUnfilledPhones = computed(() => {
   return maskedPhones.value.includes("X");
 });
@@ -707,11 +694,9 @@ const hasUnfilledPhones = computed(() => {
 const onKeydown = (e) => {
   const key = e.key;
 
-  // Поточний номер — останній у списку
   const i = phoneDigits.value.length - 1;
   const current = phoneDigits.value[i];
 
-  // ЦИФРА
   if (key >= "0" && key <= "9") {
     e.preventDefault();
     if (current.length < maskLength) {
@@ -721,7 +706,6 @@ const onKeydown = (e) => {
     return;
   }
 
-  // BACKSPACE
   if (key === "Backspace") {
     e.preventDefault();
     if (current.length > 0) {
@@ -731,17 +715,14 @@ const onKeydown = (e) => {
     return;
   }
 
-  // Блокуємо DELETE
   if (key === "Delete") {
     e.preventDefault();
     return;
   }
 
-  // Дозволені технічні
   const allowed = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Tab", "Home", "End"];
   if (allowed.includes(key)) return;
 
-  // Все інше блок
   e.preventDefault();
 };
 
