@@ -31,21 +31,11 @@
         <div class="field" :class="{ invalid: !soldier.birth_info && triedSubmit }"><label>Дата народження:</label> <input type="date" v-model="soldier.birth_info" /></div>
 
         <div class="field" :class="{ invalid: (hasUnfilledPhones || !soldier.phone_nums) && triedSubmit }">
-        <label> Номер телефону:
-        <button type="button" class="btn-add" @click="addPhone">+</button>
-        <button type="button" class="btn-remove" @click="removePhone">−</button>
-        </label>
-        <input
-  type="text"
-  inputmode="numeric"
-  :value="maskedPhones"
- @keydown="onKeydown"
-  @input="onInput"
-/>
-        <!--<textarea :value="maskedPhones" @input="onInput" @paste="onPaste" rows="1" style="overflow:hidden; resize:none;">
-
-        </textarea>
-      -->
+          <label> Номер телефону:
+          <button type="button" class="btn-add" @click="addPhone">+</button>
+          <button type="button" class="btn-remove" @click="removePhone">−</button>
+          </label>
+          <input type="text" inputmode="numeric" :value="maskedPhones" @keydown="onKeydown"  @input="onInput"/>
         </div>
 
         <div class="field" :class="{ invalid: !soldier.home_address && triedSubmit }"><label>Адреса проживання:</label>
@@ -109,14 +99,17 @@
 
       <!-- УБД -->
       <div class="field" :class="{ invalid: soldier.ubd_status && triedSubmit && (!soldier.ubd_data || !soldier.ubd_date)}">
-        <label><input type="checkbox" v-model="soldier.ubd_status" />Наявність УБД:</label>
+          <label>
+            <input type="checkbox" v-model="soldier.ubd_status" @change="!soldier.ubd_status && (soldier.ubd_data = '', soldier.ubd_date = '')"/>
+          Наявність УБД:
+          </label>
+          <label style="text-align: right">Серія, №, ким виданий:</label>
+          <input v-model="soldier.ubd_data" :disabled="!soldier.ubd_status" />
 
-        <label style="text-align: right">Серія, №, ким виданий:</label>
-        <input v-model="soldier.ubd_data" :disabled="!soldier.ubd_status" />
-
-        <label style="text-align:right">Дата видачі УБД:</label>
-        <input type="date" v-model="soldier.ubd_date" :disabled="!soldier.ubd_status" />
+          <label style="text-align:right">Дата видачі УБД:</label>
+          <input type="date" v-model="soldier.ubd_date" :disabled="!soldier.ubd_status" />
       </div>
+
 
       <!-- Інше -->
       <div class="field"><label><input type="checkbox" v-model="soldier.is_awards" />Державні нагороди:</label> <input v-model="soldier.awards" :disabled="!soldier.is_awards" /></div>
