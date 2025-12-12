@@ -126,8 +126,11 @@
       <div class="field"><label><input type="checkbox" v-model="soldier.is_admin_records"/>Адміністративні правопорушення:</label> <input v-model="soldier.admin_records" :disabled="!soldier.is_admin_records" /></div>
       <div class="field"><label><input type="checkbox" v-model="soldier.is_before_service_records"/>Правопорушення до служби:</label> <input v-model="soldier.before_service_records" :disabled="!soldier.is_before_service_records" /></div>
 
-      <h3 class="family-title">Склад сім’ї:<button class="add-row" @click="addFamilyRow">+</button></h3>
-
+      <h3 class="family-title">Склад сім’ї:
+        <button class="btn-add" @click="addFamilyRow">+</button>
+        <button class="btn-remove" @click="removeFamilyRow">-</button>
+      </h3>
+      
       <div class="family-wrapper">
         <table class="family-table">
           <thead>
@@ -272,7 +275,13 @@ function onInn(e) {
 }
 
 function addFamilyRow() {
-  soldier.value.family.push({ relation: "", fullname: "", birth_date: "", workplace: "", address: "", phone: "" })
+  soldier.value.family.push({ relation: "", fullname: "", birth_date: null, workplace: "", address: "", phone: "" })
+}
+
+function removeFamilyRow() {
+  if (soldier.value.family.length > 1) {
+    soldier.value.family.pop();
+  }
 }
 
 //--------------------------------------------------------------
@@ -318,6 +327,7 @@ async function save() {
     return;
   }
   isLoading.value = true;
+
   try {
     const res = await fetch(`${API_URL}/api/soldiers`, {
       method: "POST",
