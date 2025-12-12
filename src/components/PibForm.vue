@@ -652,17 +652,24 @@ const removePhone = () => {
   }
 };
 
+let lastValue = ""; // зберігаємо попередній стан textarea
+
 const onInput = (e) => {
+  const char = e.data; // останній введений символ (може бути null при Backspace)
+
+  // 1️⃣ Якщо введено НЕ цифру → просто відкатити зміни
+  if (char && !/^\d$/.test(char)) {
+    e.target.value = maskedPhones.value; // повертаємо маску
+    return;
+  }
+
+  // 2️⃣ Якщо Backspace
   const raw = e.target.value;
-
-  // 1. Беремо ТІЛЬКИ цифри
-  const allDigits = raw.replace(/\D/g, "");
-
-  // 2. Максимум цифр = кількість масок * кількість X у масці
+  const digits = raw.replace(/\D/g, "");
+  
   const capacity = phoneDigits.value.length * maskLength;
-  const limited = allDigits.slice(0, capacity);
+  const limited = digits.slice(0, capacity);
 
-  // 3. Розбиваємо цифри по масках
   let offset = 0;
   phoneDigits.value = phoneDigits.value.map(() => {
     const chunk = limited.slice(offset, offset + maskLength);
@@ -670,11 +677,10 @@ const onInput = (e) => {
     return chunk;
   });
 
-  // 4. Будуємо маску З НУЛЯ
   updateMaskedPhones();
 
-  // 5. Встановлюємо текст поля вручну (перекриває автозаміни)
   e.target.value = maskedPhones.value;
+  lastValue = e.target.value;
 };
 
 // ─────────────────────────────────────────────
